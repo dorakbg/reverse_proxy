@@ -84,7 +84,6 @@ class Packet:
                         self.queue.remove(i)
                 return out_queue
 
-
         if num == 0:
             self.queue.insert(0, packet)
         else:

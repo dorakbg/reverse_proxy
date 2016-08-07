@@ -26,12 +26,11 @@ class Request(Connection):
         print "unknown request id %d" % (id)
         return None
 
-
     def __init__(self, reactor, id, sock, source, destination):
         Connection.__init__(self, reactor, sock, source)
         self.destination = destination[0] + ':' + bytes(destination[1] + 1)
         self.id = id
-        self.packet_queue =[]
+        self.packet_queue = []
 
     def process(self, packet):
         packets = self.packet.output(packet)
@@ -86,8 +85,6 @@ class Request(Connection):
         msg = self.packet.pack(self.id, 'close', '')
         Tunnel.send_message(msg)
         self.delete()
-
-
 
 
 class Tunnel(Connection):

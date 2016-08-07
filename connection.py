@@ -6,6 +6,7 @@ from packet import *
 import socket
 import sys
 
+
 class Connection:
     def __init__(self, reactor, sock=None, addr=None):
         self.reactor = reactor
