@@ -1,9 +1,10 @@
 __author__ = 'admin'
 
-from event_reactor import *
-from config import *
 import random
 import time
+
+from config import *
+from event_reactor import *
 
 
 class Request(Connection):
