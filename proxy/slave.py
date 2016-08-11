@@ -142,29 +142,9 @@ class Tunnel(Connection):
         tunnel.write(msg)
 
 
-class Proxyer():
+class Proxy():
     def start(self, reactor, tunnel_num, port):
         destination = ('127.0.0.1', port)
 
         for i in range(0, tunnel_num):
             Tunnel.add(reactor, destination)
-
-
-if __name__ == '__main__':
-
-    reactor = EventReactor()
-    reactor.setDaemon(True)
-    reactor.start()
-
-    proxyer = Proxyer()
-    proxyer.start(reactor, 3, 5555)
-
-    try:
-        while (True):
-            reactor.join(2)
-            if not reactor.isAlive():
-                break
-
-    except KeyboardInterrupt:
-        print('\nstopped by keyboard')
-        exit(-1)

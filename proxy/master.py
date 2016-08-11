@@ -1,7 +1,6 @@
 __author__ = 'admin'
 
 import random
-import time
 
 from config import *
 from event_reactor import *
@@ -28,7 +27,7 @@ class Request(Connection):
 
     def __init__(self, reactor, id, sock, source, destination):
         Connection.__init__(self, reactor, sock, source)
-        self.destination = destination[0] + ':' + bytes(destination[1] + 1)
+        self.destination = destination[0] + ':' + bytes(destination[1])
         self.id = id
         self.packet_queue = []
 
@@ -112,7 +111,7 @@ class Tunnel(Connection):
 
         request = Request.get(id)
         if request == None:
-            print 'unknown request %d recevies some data' % id
+            print 'unknown request %d receives some data' % id
             return
 
         request.process(packet)
@@ -151,7 +150,7 @@ class TunnelMaster(Connection):
         exit(-1)
 
 
-class Proxyer(Connection):
+class Proxy(Connection):
     __queue = []
 
     def __init__(self, reactor, port):
@@ -161,8 +160,8 @@ class Proxyer(Connection):
 
     @staticmethod
     def add(reactor, port):
-        proxy = Proxyer(reactor, port)
-        Proxyer.__queue.append(proxy)
+        proxy = Proxy(reactor, port)
+        Proxy.__queue.append(proxy)
         reactor.add('read', proxy)
 
     def handle_read_event(self):
@@ -171,34 +170,10 @@ class Proxyer(Connection):
         Request.add(self.reactor, EventReactor.gen_id(), sock, address, destination)
 
     def handle_exception_event(self):
-        print 'Proxyer <:%d> is broken!!!' % self.port
-        Proxyer.__queue.remove(self)
+        print 'Proxy <:%d> is broken!!!' % self.port
+        Proxy.__queue.remove(self)
         self.reactor.remove(self)
         self.close()
-        if len(Proxyer.__queue) == 0:
+        if len(Proxy.__queue) == 0:
             print 'all proxy is broken, exit now!!!'
             exit(-1)
-
-
-if __name__ == '__main__':
-
-    reactor = EventReactor()
-    reactor.setDaemon(True)
-    reactor.start()
-
-    time.sleep(1)
-
-    tunnel_master = TunnelMaster(reactor, 5555)
-
-    for port in [8079]:
-        Proxyer.add(reactor, port)
-
-    try:
-        while (True):
-            reactor.join(2)
-            if not reactor.isAlive():
-                break
-
-    except KeyboardInterrupt:
-        print('\nstopped by keyboard')
-        exit(-1)
